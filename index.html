@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KALYVORA - Français 10e année</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f2f5fa;
+  color:#17243a;
+}
+header{
+  background:#142b50;
+  color:white;
+  text-align:center;
+  padding:25px 15px;
+}
+header h1{margin:0;font-size:29px}
+header p{margin:8px 0 0}
+nav{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:12px;
+  background:white;
+}
+button{
+  border:0;
+  border-radius:8px;
+  padding:12px 15px;
+  background:#1769aa;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{background:#104d80}
+main{
+  max-width:900px;
+  margin:20px auto;
+  padding:15px;
+}
+.card{
+  background:white;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px #00000010;
+}
+h2{color:#1769aa}
+h3{color:#142b50}
+.chapter{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin:8px 0;
+  background:white;
+  color:#17243a;
+  border:1px solid #d9e1ed;
+}
+.chapter:hover{background:#eaf2fc}
+.lesson{line-height:1.7}
+.exercise{
+  background:#f0f5fc;
+  padding:12px;
+  border-radius:8px;
+  margin:10px 0;
+}
+.answer{
+  display:none;
+  color:#12643b;
+  font-weight:bold;
+  margin-top:8px;
+}
+input{
+  padding:10px;
+  width:100%;
+  border:1px solid #bdc9d9;
+  border-radius:7px;
+  margin:8px 0;
+}
+footer{
+  text-align:center;
+  padding:20px;
+  color:#68778c;
+}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>KALYVORA</h1>
+  <p>FRANÇAIS – 10e ANNÉE</p>
+  <p>Apprendre. Progresser. Réussir.</p>
+</header>
+
+<nav>
+  <button onclick="showPage('accueil')">Accueil</button>
+  <button onclick="showPage('cours')">Les cours</button>
+  <button onclick="showPage('quiz')">Quiz</button>
+  <button onclick="showPage('progression')">Progression</button>
+</nav>
+
+<main>
+
+<section id="accueil" class="page">
+  <div class="card">
+    <h2>Bienvenue sur KALYVORA</h2>
+    <p>Une plateforme consacrée au français de la 10e année commune au Mali.</p>
+    <p>Découvre les leçons, entraîne-toi et évalue tes connaissances.</p>
+    <button onclick="showPage('cours')">Commencer les cours</button>
+  </div>
+
+  <div class="card">
+    <h2>Les compétences</h2>
+    <ul>
+      <li>Communication orale</li>
+      <li>Lecture et compréhension</li>
+      <li>Expression écrite</li>
+      <li>Maîtrise de la langue</li>
+    </ul>
+  </div>
+</section>
+
+<section id="cours" class="page hidden">
+  <div class="card">
+    <h2>Programme de français</h2>
+    <p>Sélectionne un chapitre pour consulter son contenu.</p>
+    <div id="chapterList"></div>
+  </div>
+</section>
+
+<section id="detail" class="page hidden">
+  <div class="card">
+    <button onclick="showPage('cours')">← Retour aux chapitres</button>
+    <div id="lessonContent" class="lesson"></div>
+  </div>
+</section>
+
+<section id="quiz" class="page hidden">
+  <div class="card">
+    <h2>Quiz de français</h2>
+    <p>Choisis la bonne réponse.</p>
+
+    <div class="exercise">
+      <p><strong>1. Quel est le rôle d'un adjectif qualificatif ?</strong></p>
+      <label><input type="radio" name="q1" value="a"> Il exprime une action.</label>
+      <label><input type="radio" name="q1" value="b"> Il donne une précision sur un nom.</label>
+      <label><input type="radio" name="q1" value="c"> Il remplace toujours un verbe.</label>
+    </div>
+
+    <div class="exercise">
+      <p><strong>2. Quel temps exprime généralement une action passée et achevée ?</strong></p>
+      <label><input type="radio" name="q2" value="a"> Le passé composé.</label>
+      <label><input type="radio" name="q2" value="b"> Le futur simple.</label>
+      <label><input type="radio" name="q2" value="c"> Le présent.</label>
+    </div>
+
+    <button onclick="correctQuiz()">Corriger</button>
+    <h3 id="quizResult"></h3>
+  </div>
+</section>
+
+<section id="progression" class="page hidden">
+  <div class="card">
+    <h2>Ma progression</h2>
+    <p>Chapitres consultés : <strong id="progressCount">0</strong></p>
+    <p>Nombre total de chapitres : <strong id="totalCount">9</strong></p>
+    <progress id="progressBar" value="0" max="9" style="width:100%"></progress>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  KALYVORA © 2026 – Français 10e année
+</footer>
+
+<script>
+const chapters = [
+{
+title:"Chapitre 1 : Les techniques du résumé",
+objectives:[
+"Comprendre un texte.",
+"Identifier les idées essentielles.",
+"Reformuler les idées sans déformer le sens."
+],
+course:`
+<h3>1. Définition</h3>
+<p>Le résumé est un texte plus court qui reprend les idées essentielles d'un texte initial en respectant son sens.</p>
+
+<h3>2. Les étapes du résumé</h3>
+<ol>
+<li>Lire attentivement le texte.</li>
+<li>Identifier le thème général.</li>
+<li>Repérer les idées principales.</li>
+<li>Supprimer les détails secondaires et les répétitions.</li>
+<li>Reformuler les idées avec ses propres mots.</li>
+<li>Relire et vérifier la cohérence.</li>
+</ol>
+
+<h3>3. Exemple</h3>
+<p><strong>Texte :</strong> La lecture permet aux élèves d'enrichir leur vocabulaire, de développer leur imagination et d'améliorer leur expression écrite. Elle constitue donc une activité importante dans leur formation.</p>
+<p><strong>Résumé :</strong> La lecture enrichit le vocabulaire, stimule l'imagination et améliore l'écriture des élèves.</p>
+
+<h3>4. À retenir</h3>
+<p>Un bon résumé doit être fidèle au texte, clair, cohérent et plus court que le texte initial.</p>
+`,
+exercises:[
+"Définis le résumé.",
+"Donne trois étapes de la rédaction d'un résumé.",
+"Pourquoi faut-il supprimer les répétitions ?",
+"Résume en une phrase le texte d'exemple."
+],
+correction:[
+"Le résumé est un texte court qui reprend les idées essentielles d'un texte initial.",
+"Lire, repérer les idées principales et reformuler.",
+"Pour rendre le résumé plus court et plus clair.",
+"La lecture enrichit le vocabulaire et améliore l'expression."
+]
+},
+{
+title:"Chapitre 2 : Le commentaire de texte",
+objectives:[
+"Comprendre un texte.",
+"Identifier son thème et ses idées.",
+"Construire une analyse organisée."
+],
+course:`
+<h3>1. Définition</h3>
+<p>Le commentaire de texte consiste à expliquer et analyser un texte en s'appuyant sur ses éléments importants.</p>
+<h3>2. Les étapes</h3>
+<ol>
+<li>Lire le texte plusieurs fois.</li>
+<li>Identifier le thème et le type de texte.</li>
+<li>Repérer les idées importantes.</li>
+<li>Étudier les procédés d'écriture.</li>
+<li>Organiser les remarques en parties cohérentes.</li>
+</ol>
+<h3>3. Les éléments à observer</h3>
+<ul>
+<li>Le vocabulaire.</li>
+<li>Les figures de style.</li>
+<li>Les temps verbaux.</li>
+<li>Le ton et les intentions de l'auteur.</li>
+</ul>
+`,
+exercises:[
+"Définis le commentaire de texte.",
+"Que faut-il identifier avant de commenter un texte ?",
+"Cite trois éléments que l'on peut analyser."
+],
+correction:[
+"Il consiste à expliquer et analyser un texte.",
+"Le thème, le type de texte et les idées principales.",
+"Le vocabulaire, les figures de style et les temps verbaux."
+]
+},
+{
+title:"Chapitre 3 : Le roman",
+objectives:[
+"Définir le roman.",
+"Identifier les éléments d'un récit.",
+"Étudier les personnages et le cadre."
+],
+course:`
+<h3>1. Définition</h3>
+<p>Le roman est un récit généralement long qui raconte une histoire réelle ou imaginaire.</p>
+<h3>2. Les éléments du roman</h3>
+<ul>
+<li><strong>Le narrateur :</strong> celui qui raconte l'histoire.</li>
+<li><strong>Les personnages :</strong> ceux qui participent à l'histoire.</li>
+<li><strong>Le cadre :</strong> le lieu et l'époque de l'action.</li>
+<li><strong>L'intrigue :</strong> l'ensemble des événements.</li>
+</ul>
+<h3>3. Les étapes du récit</h3>
+<ol>
+<li>La situation initiale.</li>
+<li>L'élément perturbateur.</li>
+<li>Les péripéties.</li>
+<li>Le dénouement.</li>
+<li>La situation finale.</li>
+</ol>
+`,
+exercises:[
+"Définis le roman.",
+"Qui est le narrateur ?",
+"Énumère les cinq étapes du récit."
+],
+correction:[
+"Le roman est un récit généralement long racontant une histoire.",
+"Le narrateur est celui qui raconte l'histoire.",
+"Situation initiale, élément perturbateur, péripéties, dénouement et situation finale."
+]
+},
+{
+title:"Chapitre 4 : Le théâtre",
+objectives:[
+"Définir le théâtre.",
+"Reconnaître les éléments d'une pièce.",
+"Comprendre le dialogue théâtral."
+],
+course:`
+<h3>1. Définition</h3>
+<p>Le théâtre est un genre littéraire destiné à être représenté devant un public.</p>
+<h3>2. Les éléments du théâtre</h3>
+<ul>
+<li><strong>Acte :</strong> grande division d'une pièce.</li>
+<li><strong>Scène :</strong> division d'un acte.</li>
+<li><strong>Réplique :</strong> parole prononcée par un personnage.</li>
+<li><strong>Didascalie :</strong> indication de mise en scène.</li>
+<li><strong>Dialogue :</strong> échange de paroles entre personnages.</li>
+</ul>
+<h3>3. Les genres théâtraux</h3>
+<p>Les principaux genres sont la tragédie, la comédie et le drame.</p>
+`,
+exercises:[
+"Définis le théâtre.",
+"Qu'est-ce qu'une didascalie ?",
+"Cite trois genres théâtraux."
+],
+correction:[
+"Le théâtre est un genre littéraire destiné à être représenté.",
+"Une indication donnée pour la mise en scène.",
+"La tragédie, la comédie et le drame."
+]
+},
+{
+title:"Chapitre 5 : La poésie et la versification",
+objectives:[
+"Définir la poésie.",
+"Reconnaître un vers et une strophe.",
+"Identifier quelques formes de rimes."
+],
+course:`
+<h3>1. Définition</h3>
+<p>La poésie est un genre littéraire qui utilise le rythme, les sonorités et les images pour exprimer des idées et des sentiments.</p>
+<h3>2. Le vocabulaire poétique</h3>
+<ul>
+<li><strong>Vers :</strong> une ligne d'un poème.</li>
+<li><strong>Strophe :</strong> un groupe de vers.</li>
+<li><strong>Rime :</strong> répétition de sons à la fin des vers.</li>
+<li><strong>Mètre :</strong> nombre de syllabes d'un vers.</li>
+</ul>
+<h3>3. Quelques types de strophes</h3>
+<ul>
+<li>Distique : deux vers.</li>
+<li>Tercet : trois vers.</li>
+<li>Quatrain : quatre vers.</li>
+</ul>
+`,
+exercises:[
+"Définis un vers.",
+"Qu'est-ce qu'une strophe ?",
+"Comment appelle-t-on une strophe de quatre vers ?"
+],
+correction:[
+"Un vers est une ligne d'un poème.",
+"Une strophe est un groupe de vers.",
+"Un quatrain."
+]
+},
+{
+title:"Chapitre 6 : Les figures de style",
+objectives:[
+"Reconnaître les figures de style.",
+"Comprendre leurs effets.",
+"Les employer dans une phrase."
+],
+course:`
+<h3>1. Définition</h3>
+<p>Une figure de style est un procédé d'expression qui donne plus de force ou d'originalité à un message.</p>
+<h3>2. Quelques figures importantes</h3>
+<p><strong>La comparaison :</strong> rapproche deux éléments avec un outil de comparaison.</p>
+<p>Exemple : Il est courageux comme un lion.</p>
+<p><strong>La métaphore :</strong> rapproche deux éléments sans outil de comparaison.</p>
+<p>Exemple : Cet homme est un lion.</p>
+<p><strong>La personnification :</strong> attribue des caractéristiques humaines à un objet ou à un animal.</p>
+<p>Exemple : Le vent murmure.</p>
+<p><strong>L'hyperbole :</strong> exagère une idée.</p>
+<p>Exemple : Je t'ai attendu mille ans.</p>
+<p><strong>L'antithèse :</strong> oppose deux idées.</p>
+<p>Exemple : Il rit le jour et pleure la nuit.</p>
+`,
+exercises:[
+"Définis une figure de style.",
+"Identifie la figure dans : Il est rapide comme l'éclair.",
+"Identifie la figure dans : Le soleil sourit.",
+"Donne un exemple d'hyperbole."
+],
+correction:[
+"Un procédé d'expression qui renforce ou embellit un message.",
+"La comparaison.",
+"La personnification.",
+"Exemple : Je t'ai attendu une éternité."
+]
+},
+{
+title:"Chapitre 7 : La dissertation",
+objectives:[
+"Comprendre le sujet.",
+"Construire un plan.",
+"Rédiger une introduction et une conclusion."
+],
+course:`
+<h3>1. Définition</h3>
+<p>La dissertation est un exercice de réflexion dans lequel on répond à une question en développant des arguments organisés.</p>
+<h3>2. Les parties</h3>
+<ul>
+<li><strong>Introduction :</strong> présentation du sujet et annonce du plan.</li>
+<li><strong>Développement :</strong> arguments, explications et exemples.</li>
+<li><strong>Conclusion :</strong> bilan et réponse à la question.</li>
+</ul>
+<h3>3. Méthode</h3>
+<ol>
+<li>Lire et comprendre le sujet.</li>
+<li>Définir les mots importants.</li>
+<li>Rechercher des idées et des exemples.</li>
+<li>Organiser les arguments.</li>
+<li>Rédiger et relire.</li>
+</ol>
+`,
+exercises:[
+"Définis la dissertation.",
+"Quelles sont ses trois grandes parties ?",
+"Pourquoi faut-il organiser les arguments ?"
+],
+correction:[
+"La dissertation est un exercice de réflexion organisé autour d'un sujet.",
+"L'introduction, le développement et la conclusion.",
+"Pour rendre le raisonnement clair et logique."
+]
+},
+{
+title:"Chapitre 8 : La littérature africaine",
+objectives:[
+"Découvrir la littérature africaine.",
+"Identifier quelques thèmes.",
+"Comprendre le rôle de la littérature."
+],
+course:`
+<h3>1. Définition</h3>
+<p>La littérature africaine regroupe des œuvres écrites par des auteurs africains et portant sur des réalités, des expériences ou des imaginaires liés à l'Afrique.</p>
+<h3>2. Quelques thèmes</h3>
+<ul>
+<li>La tradition et la modernité.</li>
+<li>La famille et la société.</li>
+<li>L'éducation.</li>
+<li>La colonisation et l'indépendance.</li>
+<li>L'identité culturelle.</li>
+</ul>
+<h3>3. Les genres littéraires</h3>
+<p>La littérature africaine comprend notamment le roman, la poésie, le théâtre et le conte.</p>
+`,
+exercises:[
+"Définis la littérature africaine.",
+"Cite trois thèmes présents dans les œuvres africaines.",
+"Donne trois genres littéraires."
+],
+correction:[
+"Elle regroupe des œuvres d'auteurs africains.",
+"La tradition, l'éducation et l'identité culturelle, par exemple.",
+"Le roman, la poésie et le théâtre."
+]
+},
+{
+title:"Chapitre 9 : L'expression écrite",
+objectives:[
+"Construire un texte cohérent.",
+"Organiser ses idées.",
+"Améliorer la qualité de ses écrits."
+],
+course:`
+<h3>1. Définition</h3>
+<p>L'expression écrite consiste à communiquer des idées par écrit en respectant les règles de la langue.</p>
+<h3>2. Les qualités d'un bon texte</h3>
+<ul>
+<li>La clarté.</li>
+<li>La cohérence.</li>
+<li>La correction grammaticale.</li>
+<li>La ponctuation adaptée.</li>
+<li>Le vocabulaire précis.</li>
+</ul>
+<h3>3. Les étapes de rédaction</h3>
+<ol>
+<li>Comprendre la consigne.</li>
+<li>Rechercher les idées.</li>
+<li>Faire un plan.</li>
+<li>Rédiger les paragraphes.</li>
+<li>Relire et corriger.</li>
+</ol>
+`,
+exercises:[
+"Qu'est-ce que l'expression écrite ?",
+"Cite quatre qualités d'un bon texte.",
+"Quelles sont les étapes de rédaction ?"
+],
+correction:[
+"C'est l'action de communiquer des idées par écrit.",
+"La clarté, la cohérence, la correction grammaticale et la ponctuation.",
+"Comprendre la consigne, rechercher les idées, faire un plan, rédiger et relire."
+]
+}
+];
+
+let completed = JSON.parse(localStorage.getItem("kalyvoraCompleted") || "[]");
+
+function showPage(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+function loadChapters(){
+  const list=document.getElementById("chapterList");
+  list.innerHTML="";
+  chapters.forEach((chapter,index)=>{
+    const button=document.createElement("button");
+    button.className="chapter";
+    button.textContent=(completed.includes(index)?"✓ ":"")+chapter.title;
+    button.onclick=()=>openChapter(index);
+    list.appendChild(button);
+  });
+  updateProgress();
+}
+
+function openChapter(index){
+  const chapter=chapters[index];
+  const content=document.getElementById("lessonContent");
+
+  let html=`
+    <h2>${chapter.title}</h2>
+    <h3>Objectifs de la leçon</h3>
+    <ul>${chapter.objectives.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <h3>Leçon</h3>
+    ${chapter.course}
+    <h3>Exercices d'application</h3>
+  `;
+
+  chapter.exercises.forEach((exercise,i)=>{
+    html+=`
+      <div class="exercise">
+        <p><strong>Exercice ${i+1} :</strong> ${exercise}</p>
+        <button onclick="toggleAnswer('answer${index}_${i}')">Voir la correction</button>
+        <p class="answer" id="answer${index}_${i}">
+          ${chapter.correction[i]}
+        </p>
+      </div>
+    `;
+  });
+
+  html+=`
+    <button onclick="completeChapter(${index})">Marquer comme terminé</button>
+  `;
+
+  content.innerHTML=html;
+  showPage("detail");
+}
+
+function toggleAnswer(id){
+  const answer=document.getElementById(id);
+  answer.style.display=answer.style.display==="block"?"none":"block";
+}
+
+function completeChapter(index){
+  if(!completed.includes(index)){
+    completed.push(index);
+    localStorage.setItem("kalyvoraCompleted",JSON.stringify(completed));
+  }
+  loadChapters();
+  alert("Chapitre marqué comme terminé !");
+}
+
+function updateProgress(){
+  document.getElementById("progressCount").textContent=completed.length;
+  document.getElementById("totalCount").textContent=chapters.length;
+  document.getElementById("progressBar").value=completed.length;
+}
+
+function correctQuiz(){
+  let score=0;
+  if(document.querySelector('input[name="q1"]:checked')?.value==="b")score++;
+  if(document.querySelector('input[name="q2"]:checked')?.value==="a")score++;
+
+  document.getElementById("quizResult").textContent=
+    "Résultat : "+score+"/2";
+}
+
+loadChapters();
+</script>
+
+</body>
+</html>
